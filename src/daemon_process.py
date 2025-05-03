@@ -5,6 +5,7 @@ import sys  # 导入sys库，用于执行系统相关的操作
 
 from config import Config  # 导入配置管理类
 from github_client import GitHubClient  # 导入GitHub客户端类，处理GitHub API请求
+from hackernews_client import HackernewsClient  # 导入HackerNews客户端类，处理HackerNews API请求
 from notifier import Notifier  # 导入通知器类，用于发送通知
 from report_generator import ReportGenerator  # 导入报告生成器类
 from llm import LLM  # 导入语言模型类，可能用于生成报告内容
@@ -18,7 +19,7 @@ def graceful_shutdown(signum, frame):
     sys.exit(0)  # 安全退出程序
 
 def github_job(subscription_manager, github_client, report_generator, notifier, days):
-    LOG.info("[开始执行定时任务]")
+    LOG.info("[开始执行定时任务]-GitHub")
     subscriptions = subscription_manager.list_subscriptions()  # 获取当前所有订阅
     LOG.info(f"订阅列表：{subscriptions}")
     for repo in subscriptions:
@@ -27,7 +28,14 @@ def github_job(subscription_manager, github_client, report_generator, notifier, 
         # 从Markdown文件自动生成进展简报
         report, report_file_path = report_generator.generate_report_by_date_range(markdown_file_path, days)
         notifier.notify(repo, report)
-    LOG.info(f"[定时任务执行完毕]")
+    LOG.info(f"[定时任务执行完毕]-GitHub")
+
+def hackernews_job(hackernews_client, report_generator, notifier):
+    LOG.info("[开始执行定时任务]-HackerNews")
+    markdown_file_path = hackernews_client.export_top_stories()
+    report, report_file_path = report_generator.generate_hackernews_report(markdown_file_path)
+    notifier.send_hackernews_email(report)
+    LOG.info(f"[定时任务执行完毕]-HackerNews")
 
 
 def main():
@@ -36,6 +44,7 @@ def main():
 
     config = Config()  # 创建配置实例
     github_client = GitHubClient(config.github_token)  # 创建GitHub客户端实例
+    hackernews_client = HackernewsClient()  # 创建HackerNews客户端实例
     notifier = Notifier(config.email)  # 创建通知器实例
     llm = LLM()  # 创建语言模型实例
     report_generator = ReportGenerator(llm)  # 创建报告生成器实例
@@ -43,6 +52,7 @@ def main():
 
     # 启动时立即执行（如不需要可注释）
     github_job(subscription_manager, github_client, report_generator, notifier, config.freq_days)
+    hackernews_job(hackernews_client, report_generator, notifier)
 
     # 安排每天的定时任务
     schedule.every(config.freq_days).days.at(

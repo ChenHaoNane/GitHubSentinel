@@ -39,3 +39,18 @@ class ReportGenerator:
 
         return report, report_file_path
 
+    def generate_hackernews_report(self, markdown_file_path):
+        # 读取Markdown文件并使用LLM生成Hacker News日报
+        with open(markdown_file_path, 'r') as file:
+            markdown_content = file.read()
+
+        report = self.llm.generate_hackernews_report(markdown_content)  # 调用LLM生成HackerNews报告
+
+        report_file_path = os.path.splitext(markdown_file_path)[0] + "_report.md"
+        with open(report_file_path, 'w+') as report_file:
+            report_file.write(report)
+
+        LOG.info(f"Hacker News 日报已保存到 {report_file_path}")
+        
+        return report, report_file_path  # 返回报告内容和报告文件路径
+

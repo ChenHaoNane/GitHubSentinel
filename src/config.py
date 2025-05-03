@@ -1,6 +1,10 @@
 import json
 import os
 
+from dotenv import load_dotenv
+
+# 加载 .env 文件
+load_dotenv()
 class Config:
     def __init__(self):
         self.load_config()

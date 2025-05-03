@@ -34,6 +34,25 @@ class Notifier:
         except Exception as e:
             LOG.error(f"发送邮件失败：{str(e)}")
 
+    def send_hackernews_email(self, report):
+        LOG.info("准备发送邮件")
+        msg = MIMEMultipart()
+        msg['From'] = self.email_settings['from']
+        msg['To'] = self.email_settings['to']
+        msg['Subject'] = f"[HackerNewsSentinel] Hacker News 首页新闻列表"   
+
+        # 将Markdown内容转换为HTML
+        html_report = markdown2.markdown(report)
+        msg.attach(MIMEText(html_report, 'html'))
+        try:
+            with smtplib.SMTP_SSL(self.email_settings['smtp_server'], self.email_settings['smtp_port']) as server:
+                LOG.debug("登录SMTP服务器")
+                server.login(msg['From'], self.email_settings['password'])
+                server.sendmail(msg['From'], msg['To'], msg.as_string())
+                LOG.info("邮件发送成功！")
+        except Exception as e:
+            LOG.error(f"发送邮件失败：{str(e)}")
+
 if __name__ == '__main__':
     from config import Config
     config = Config()
