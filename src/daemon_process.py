@@ -59,6 +59,11 @@ def main():
         config.exec_time
     ).do(github_job, subscription_manager, github_client, report_generator, notifier, config.freq_days)
 
+    # 安排每12个小时执行一次HackerNews任务
+    schedule.every(12).hours.at(
+        config.exec_time
+    ).do(hackernews_job, hackernews_client, report_generator, notifier)
+
     try:
         # 在守护进程中持续运行
         while True:
