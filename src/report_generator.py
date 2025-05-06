@@ -87,6 +87,24 @@ class ReportGenerator:
                 with open(os.path.join(directory_path, filename), 'r') as file:
                     markdown_content += file.read() + "\n"
         return markdown_content
+    
+    def generate_tc_daily_report(self, markdown_file_path):
+        """
+        生成 TechCrunch 每日汇总的报告，并保存为 {original_filename}_report.md。
+        """
+        with open(markdown_file_path, 'r') as file:
+            markdown_content = file.read()
+
+        system_prompt = self.prompts.get("tech_crunch_daily_report")
+        report = self.llm.generate_report(system_prompt, markdown_content)
+        
+        report_file_path = os.path.splitext(markdown_file_path)[0] + "_report.md"
+        with open(report_file_path, 'w+') as report_file:
+            report_file.write(report)
+
+        LOG.info(f"TechCrunch 每日汇总报告已保存到 {report_file_path}")
+        return report, report_file_path
+        
 
 
 if __name__ == '__main__':

@@ -1,0 +1,72 @@
+[
+  {
+    "name": "All",
+    "tag": "all",
+    "feed_url": "https://techcrunch.com/feed/"
+  },
+  {
+    "name": "Artificial Intelligence",
+    "tag": "ai",
+    "feed_url": "https://techcrunch.com/tag/artificial-intelligence/feed/"
+  },
+  {
+    "name": "Machine Learning",
+    "tag": "ml",
+    "feed_url": "https://techcrunch.com/tag/machine-learning/feed/"
+  },
+  {
+    "name": "OpenAI",
+    "tag": "openai",
+    "feed_url": "https://techcrunch.com/tag/openai/feed/"
+  },
+  {
+    "name": "ChatGPT",
+    "tag": "chatgpt",
+    "feed_url": "https://techcrunch.com/tag/chatgpt/feed/"
+  },
+  {
+    "name": "Developers",
+    "tag": "developers",
+    "feed_url": "https://techcrunch.com/tag/developers/feed/"
+  },
+  {
+    "name": "Programming",
+    "tag": "programming",
+    "feed_url": "https://techcrunch.com/tag/programming/feed/"
+  },
+  {
+    "name": "GitHub",
+    "tag": "github",
+    "feed_url": "https://techcrunch.com/tag/github/feed/"
+  },
+  {
+    "name": "Technology",
+    "tag": "technology",
+    "feed_url": "https://techcrunch.com/tag/technology/feed/"
+  },
+  {
+    "name": "Software",
+    "tag": "software",
+    "feed_url": "https://techcrunch.com/tag/software/feed/"
+  },
+  {
+    "name": "Engineering",
+    "tag": "engineering",
+    "feed_url": "https://techcrunch.com/tag/engineering/feed/"
+  },
+  {
+    "name": "Big Tech",
+    "tag": "bigtech",
+    "feed_url": "https://techcrunch.com/tag/big-tech/feed/"
+  },
+  {
+    "name": "Startups",
+    "tag": "startups",
+    "feed_url": "https://techcrunch.com/startups/feed/"
+  },
+  {
+    "name": "Fundings & Exits",
+    "tag": "funding",
+    "feed_url": "https://techcrunch.com/fundings-exits/feed/"
+  }
+]

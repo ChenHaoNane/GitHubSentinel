@@ -8,6 +8,7 @@ from datetime import datetime  # 导入 datetime 模块用于获取当前日期
 from config import Config  # 导入配置管理类
 from github_client import GitHubClient  # 导入GitHub客户端类，处理GitHub API请求
 from hacker_news_client import HackerNewsClient
+from tech_crunch_client import TechCrunchRSSClient
 from notifier import Notifier  # 导入通知器类，用于发送通知
 from report_generator import ReportGenerator  # 导入报告生成器类
 from llm import LLM  # 导入语言模型类，可能用于生成报告内容
@@ -32,6 +33,12 @@ def github_job(subscription_manager, github_client, report_generator, notifier, 
         notifier.notify_github_report(repo, report)
     LOG.info(f"[定时任务执行完毕]")
 
+def tc_daily_job(tech_crunch_client, report_generator, notifier, days):
+    LOG.info("[开始执行定时任务]TechCrunch 今日热点新闻")
+    markdown_file_path = tech_crunch_client.export_progress_by_date_range(days)
+    report, _ = report_generator.generate_tc_daily_report(markdown_file_path)
+    notifier.notify_tc_report(report)
+    LOG.info(f"[定时任务执行完毕]")
 
 def hn_topic_job(hacker_news_client, report_generator):
     LOG.info("[开始执行定时任务]Hacker News 热点话题跟踪")
@@ -59,6 +66,7 @@ def main():
     config = Config()  # 创建配置实例
     github_client = GitHubClient(config.github_token)  # 创建GitHub客户端实例
     hacker_news_client = HackerNewsClient() # 创建 Hacker News 客户端实例
+    tech_crunch_client = TechCrunchRSSClient() # 创建 TechCrunch RSS 客户端实例
     notifier = Notifier(config.email)  # 创建通知器实例
     llm = LLM(config)  # 创建语言模型实例
     report_generator = ReportGenerator(llm, config.report_types)  # 创建报告生成器实例
@@ -68,15 +76,22 @@ def main():
     # github_job(subscription_manager, github_client, report_generator, notifier, config.freq_days)
     hn_daily_job(hacker_news_client, report_generator, notifier)
 
+    tc_daily_job(tech_crunch_client, report_generator, notifier, config.freq_days)
+
     # 安排 GitHub 的定时任务
     schedule.every(config.freq_days).days.at(
         config.exec_time
     ).do(github_job, subscription_manager, github_client, report_generator, notifier, config.freq_days)
     
-    # 安排 hn_topic_job 每4小时执行一次，从0点开始
+    # 安排 TechCrunch 的定时任务
+    schedule.every(config.freq_days).days.at(
+        config.exec_time
+    ).do(tc_daily_job, tech_crunch_client, report_generator, notifier, config.freq_days)
+
+    # # 安排 hn_topic_job 每4小时执行一次，从0点开始
     schedule.every(4).hours.at(":00").do(hn_topic_job, hacker_news_client, report_generator)
 
-    # 安排 hn_daily_job 每天早上10点执行一次
+    # # 安排 hn_daily_job 每天早上10点执行一次
     schedule.every().day.at("10:00").do(hn_daily_job, hacker_news_client, report_generator, notifier)
 
     try:
